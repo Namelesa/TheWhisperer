@@ -50,7 +50,6 @@ public class UserOrchestrator(
         if (editUserDto.Email is not null)
         {
             var newEmailHash = hasherUser.Hash(editUserDto.Email);
-
             var existingUser = await userRepository.GetUserByEmailHashAsync(newEmailHash);
 
             if (existingUser is not null && existingUser.Id != user.Id)
@@ -69,6 +68,8 @@ public class UserOrchestrator(
             var confirmation = new UserEmailConfirmation(user.Id);
             confirmation.SetToken(tokenHash);
 
+            // Send email confirmation to the new email address
+            
             await userEmailConfirmationRepository.AddAsync(confirmation);
         }
 

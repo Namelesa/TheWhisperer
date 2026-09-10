@@ -51,6 +51,8 @@ public class RegisterOrchestrator(
         var confirmation = new UserEmailConfirmation(user.Id);
         confirmation.SetToken(tokenHash);
 
+        // Send email with the token to the user's email address
+        
         await userEmailConfirmationRepository.AddAsync(confirmation);
         
         return OperationResult<string>.Ok("Registration successful. Please check your email.");
@@ -94,7 +96,7 @@ public class RegisterOrchestrator(
 
         user.ConfirmEmail();
         confirmation.MarkAsUsed();
-
+        
         await userRepository.UpdateUserAsync(user);
         await userEmailConfirmationRepository.UpdateAsync(confirmation);
         
