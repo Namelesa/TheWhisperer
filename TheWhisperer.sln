@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{E4C940F5-DFB2-46D0-B575-F4C5C0207E47}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{BCBB3177-9D17-4E46-AF38-00686160C7A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{BC7176D1-851E-4041-AD90-763EAE0FCCA6}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE07DD86-46B5-44DA-8587-D43C0531808B}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4C940F5-DFB2-46D0-B575-F4C5C0207E47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4C940F5-DFB2-46D0-B575-F4C5C0207E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4C940F5-DFB2-46D0-B575-F4C5C0207E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4C940F5-DFB2-46D0-B575-F4C5C0207E47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E4C940F5-DFB2-46D0-B575-F4C5C0207E47} = {BCBB3177-9D17-4E46-AF38-00686160C7A7}
+	EndGlobalSection
+EndGlobal
