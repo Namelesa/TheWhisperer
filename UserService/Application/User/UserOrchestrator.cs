@@ -1,4 +1,7 @@
+using AutoMapper;
 using FluentValidation;
+using Encryptor.Decryption;
+using Encryptor.Encryption;
 using UserService.Application.EmailConfirmation;
 using UserService.Application.HasherPassword;
 using UserService.Application.HasherUser;
@@ -13,12 +16,28 @@ public class UserOrchestrator(
     IValidator<EditUserDto> validator,
     IHasherUser hasherUser,
     IHasherPassword hasherPassword,
+    IMapper mapper,
     IUserEmailConfirmationRepository userEmailConfirmationRepository,
-    IEmailConfirmationService emailConfirmationService) : IUserOrchestrator
+    IEmailConfirmationService emailConfirmationService,
+    IDecryptInfo decryptInfo,
+    IEncryptInfo encryptInfo) : IUserOrchestrator
 {
+    public async Task<OperationResult<UserDto>> GetUserByIdAsync(Guid userId)
+    {
+        var user = await userRepository.GetUserByIdAsync(userId);
+
+        if (user is null)
+            return OperationResult<UserDto>.Fail("User with this nick name does not exist");
+
+        decryptInfo.DecryptObjectStrings(user);
+        var userDto = mapper.Map<UserDto>(user);
+        
+        return OperationResult<UserDto>.Ok(userDto);
+    }
+    
     public async Task<OperationResult<string>> UpdateUserAsync(
         EditUserDto editUserDto,
-        string nickName)
+        Guid userId)
     {
         var validationResult = await validator.ValidateAsync(editUserDto);
         if (!validationResult.IsValid) 
@@ -29,9 +48,8 @@ public class UserOrchestrator(
             editUserDto.Email is null &&
             editUserDto.Image is null)
             return OperationResult<string>.Fail("No data to update");
-
-        var hashedNickName = hasherUser.Hash(nickName);
-        var user = await userRepository.GetUserByNickNameHashAsync(hashedNickName);
+        
+        var user = await userRepository.GetUserByIdAsync(userId);
 
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");
@@ -39,12 +57,13 @@ public class UserOrchestrator(
         if (editUserDto.NewNickName is not null)
         {
             var newNickNameHash = hasherUser.Hash(editUserDto.NewNickName);
-            var existingUser = await userRepository.GetUserByNickNameHashAsync(newNickNameHash);
+            var existingUser = await userRepository.GetUserByIdAsync(userId);
 
             if (existingUser is not null && existingUser.Id != user.Id)
                 return OperationResult<string>.Fail("User with this nick name already exists");
 
-            user.UpdateNickName(editUserDto.NewNickName, newNickNameHash);
+            var encryptedNewNickName = encryptInfo.Encrypt(editUserDto.NewNickName);
+            user.UpdateNickName(encryptedNewNickName, newNickNameHash);
         }
 
         if (editUserDto.Email is not null)
@@ -54,10 +73,9 @@ public class UserOrchestrator(
 
             if (existingUser is not null && existingUser.Id != user.Id)
                 return OperationResult<string>.Fail("User with this email already exists");
-
-            user.UpdateEmail(
-                editUserDto.Email,
-                newEmailHash);
+            
+            var encryptedEmail = encryptInfo.Encrypt(editUserDto.Email);
+            user.UpdateEmail(encryptedEmail, newEmailHash);
 
             await userEmailConfirmationRepository
                 .DeleteByUserIdAsync(user.Id);
@@ -75,17 +93,17 @@ public class UserOrchestrator(
 
         if (editUserDto.Image is not null)
         {
-            user.SetImage(editUserDto.Image);
+            var encryptedImage = encryptInfo.Encrypt(editUserDto.Image);
+            user.SetImage(encryptedImage);
         }
 
         await userRepository.UpdateUserAsync(user);
         return OperationResult<string>.Ok("User data updated successfully");
     }
 
-    public async Task<OperationResult<string>> DeleteUserAsync(string nickName)
+    public async Task<OperationResult<string>> DeleteUserAsync(Guid userId)
     {
-        var hashedNickName = hasherUser.Hash(nickName);
-        var user = await userRepository.GetUserByNickNameHashAsync(hashedNickName);
+        var user = await userRepository.GetUserByIdAsync(userId);
 
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");
@@ -95,10 +113,9 @@ public class UserOrchestrator(
         return OperationResult<string>.Ok("User deleted successfully");
     }
 
-    public async Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto)
+    public async Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto, Guid userId)
     {
-        var hashedNickName = hasherUser.Hash(editUserPasswordDto.NickName);
-        var user = await userRepository.GetUserByNickNameHashAsync(hashedNickName);
+        var user = await userRepository.GetUserByIdAsync(userId);
 
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");

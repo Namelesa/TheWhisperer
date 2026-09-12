@@ -17,10 +17,10 @@ public class UserController(
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UpdateUserAsync(
         [Required, FromForm] EditUserContract editUserContract, 
-        [FromQuery] string nickName)
+        [FromQuery] Guid userId)
     {
         var editDto = mapper.Map<EditUserDto>(editUserContract);
-        var result = await userOrchestrator.UpdateUserAsync(editDto, nickName);
+        var result = await userOrchestrator.UpdateUserAsync(editDto, userId);
 
         return result.Success
             ? Ok(new { message = result.Data })
@@ -29,10 +29,10 @@ public class UserController(
     
     [HttpPatch("edit-user-password")]
     public async Task<IActionResult> UpdateUserPasswordAsync(
-        [Required, FromForm] EditUserPasswordContract editUserPasswordContract)
+        [Required, FromForm] EditUserPasswordContract editUserPasswordContract, Guid userId)
     {
         var editDto = mapper.Map<EditUserPasswordDto>(editUserPasswordContract);
-        var result = await userOrchestrator.UpdateUserPasswordAsync(editDto);
+        var result = await userOrchestrator.UpdateUserPasswordAsync(editDto, userId);
 
         return result.Success
             ? Ok(new { message = result.Data })
@@ -40,12 +40,22 @@ public class UserController(
     } 
     
     [HttpDelete("delete-user")]
-    public async Task<IActionResult> DeleteUserAsync(string nickName)
+    public async Task<IActionResult> DeleteUserAsync(Guid userId)
     {
-        var result = await userOrchestrator.DeleteUserAsync(nickName);
+        var result = await userOrchestrator.DeleteUserAsync(userId);
 
         return result.Success
             ? Ok(new { message = result.Data })
             : BadRequest(new { message = result.Message });
     }     
+    
+    [HttpGet("get-user")]
+    public async Task<IActionResult> GetUserAsync(Guid userId)
+    {
+        var result = await userOrchestrator.GetUserByIdAsync(userId);
+
+        return result.Success
+            ? Ok(new { message = result.Data })
+            : BadRequest(new { message = result.Message });
+    }
 }

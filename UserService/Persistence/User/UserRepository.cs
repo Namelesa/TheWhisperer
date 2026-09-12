@@ -11,12 +11,14 @@ public class UserRepository(AppDbContext db) : IUserRepository
         await db.SaveChangesAsync();
     }
 
-    public async Task<Core.User.User?> GetUserByNickNameHashAsync(string nickNameHash) =>
-        await db.Users.FirstOrDefaultAsync(u => u.NickNameHash == nickNameHash);
+    public async Task<Core.User.User?> GetUserByIdAsync(Guid userId) =>
+        await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
     public async Task<Core.User.User?> GetUserByEmailHashAsync(string emailHash) =>
         await db.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
-    
+
+    public async Task<Core.User.User?> GetUserByNickNameHashAsync(string nickNameHash) =>
+        await db.Users.FirstOrDefaultAsync(u => u.NickNameHash == nickNameHash);
     public async Task DeleteUserAsync(Core.User.User user)
     {
         db.Users.Remove(user);

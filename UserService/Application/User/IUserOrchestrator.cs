@@ -6,7 +6,8 @@ public interface IUserOrchestrator
 {
     public Task<OperationResult<string>> UpdateUserAsync(
         EditUserDto editUserDto, 
-        string nickName);
-    public Task<OperationResult<string>> DeleteUserAsync(string nickName);
-    public Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto);
+        Guid userId);
+    public Task<OperationResult<string>> DeleteUserAsync(Guid userId);
+    public Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto, Guid userId);
+    public Task<OperationResult<UserDto>> GetUserByIdAsync(Guid userId);
 }

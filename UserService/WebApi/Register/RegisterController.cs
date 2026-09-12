@@ -28,10 +28,10 @@ public class RegisterController(
     [HttpPost("confirm-email")]
     public async Task<IActionResult> ConfirmEmailAsync(
         [FromQuery] string token,
-        [FromQuery] string nickName)
+        [FromQuery] string nickname)
     {
         var result = await registerOrchestrator
-            .EmailConfirmationAsync(token, nickName);
+            .EmailConfirmationAsync(token, nickname);
 
         return result.Success
             ? Ok(new { message = result.Data })

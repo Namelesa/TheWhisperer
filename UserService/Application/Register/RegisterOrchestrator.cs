@@ -1,4 +1,5 @@
 using AutoMapper;
+using Encryptor.Encryption;
 using FluentValidation;
 using UserService.Application.EmailConfirmation;
 using UserService.Application.HasherPassword;
@@ -16,7 +17,8 @@ public class RegisterOrchestrator(
     IHasherPassword hasherPassword,
     IValidator<RegisterDto> validator,
     IEmailConfirmationService emailConfirmationService,
-    IUserEmailConfirmationRepository userEmailConfirmationRepository) : IRegisterOrchestrator
+    IUserEmailConfirmationRepository userEmailConfirmationRepository,
+    IEncryptInfo encryptInfo) : IRegisterOrchestrator
 {
     public async Task<OperationResult<string>> RegisterUserAsync(RegisterDto registerDto)
     {
@@ -41,8 +43,7 @@ public class RegisterOrchestrator(
             hashedEmail, 
             hashedPassword);
         
-        //encrypt
-
+        encryptInfo.EncryptObjectStrings(user);
         await userRepository.AddUserAsync(user);
         
         var token = emailConfirmationService.GenerateToken();
@@ -50,6 +51,7 @@ public class RegisterOrchestrator(
 
         var confirmation = new UserEmailConfirmation(user.Id);
         confirmation.SetToken(tokenHash);
+        Console.WriteLine($"Confirmation token for user {registerDto.NickName}: {token}");
 
         // Send email with the token to the user's email address
         
@@ -60,12 +62,10 @@ public class RegisterOrchestrator(
 
     public async Task<OperationResult<string>> EmailConfirmationAsync(
         string emailConfirmationToken,
-        string userNickName)
+        string nickName)
     {
-        var hashedNickName = hasherUser.Hash(userNickName);
-
-        var user = await userRepository
-            .GetUserByNickNameHashAsync(hashedNickName);
+        var hashedNickName = hasherUser.Hash(nickName);
+        var user = await userRepository.GetUserByNickNameHashAsync(hashedNickName);
 
         if (user is null)
             return OperationResult<string>.Fail("User not found");
