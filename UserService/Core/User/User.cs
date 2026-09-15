@@ -5,13 +5,11 @@ namespace UserService.Core.User;
 public class User(
     string nickName, 
     string email, 
-    string secretWort, 
     string? image)
 {
     [Key]
     public Guid Id { get; init; }
     public string NickName { get; private set; } = nickName;
-    public string SecretWort { get; init; } = secretWort;
     public string Email { get; private set; } = email;
     public string EmailHash { get; private set; } 
     public bool ConfirmedEmail { get; private set; }

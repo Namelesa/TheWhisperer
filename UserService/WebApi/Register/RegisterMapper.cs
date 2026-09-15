@@ -12,7 +12,6 @@ public class RegisterMapper : Profile
         CreateMap<RegisterDto, Core.User.User>()
             .ForCtorParam("nickName", opt => opt.MapFrom(src => src.NickName))
             .ForCtorParam("email", opt => opt.MapFrom(src => src.Email))
-            .ForCtorParam("secretWort", opt => opt.MapFrom(src => src.SecretWord))
             .ForCtorParam("image", opt => opt.MapFrom(src => src.Image));
     }
 }

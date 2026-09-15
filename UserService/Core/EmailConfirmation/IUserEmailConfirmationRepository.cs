@@ -11,5 +11,5 @@ public interface IUserEmailConfirmationRepository
 
     public Task DeleteAsync(UserEmailConfirmation token);
     
-    public Task DeleteByUserIdAsync(Guid userId);
+    public Task DeleteAllByUserIdAsync(Guid userId);
 }

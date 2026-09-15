@@ -7,8 +7,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 {
     public DbSet<Core.User.User> Users { get; init; }
 
-    public DbSet<Core.EmailConfirmation.UserEmailConfirmation>
-        UserEmailConfirmations { get; init; }
+    public DbSet<Core.EmailConfirmation.UserEmailConfirmation> UserEmailConfirmations { get; init; }
+    public DbSet<Core.ForgotPassword.UserForgotPassword> UserForgotPasswords { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,11 +26,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             builder.Property(x => x.Email)
                 .HasMaxLength(80)
                 .IsRequired();
-
-            builder.Property(x => x.SecretWort)
-                .HasMaxLength(80)
-                .IsRequired();
-
+            
             builder.Property(x => x.NickNameHash)
                 .HasMaxLength(120)
                 .IsRequired();
@@ -54,6 +50,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         });
 
         modelBuilder.Entity<Core.EmailConfirmation.UserEmailConfirmation>(
+            builder =>
+            {
+                builder.HasKey(x => x.Id);
+
+                builder.Property(x => x.TokenHash)
+                    .IsRequired();
+
+                builder.HasIndex(x => x.TokenHash)
+                    .IsUnique();
+
+                builder.Property(x => x.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(x => x.ExpiresAt)
+                    .IsRequired();
+
+                builder.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        
+        modelBuilder.Entity<Core.ForgotPassword.UserForgotPassword>(
             builder =>
             {
                 builder.HasKey(x => x.Id);

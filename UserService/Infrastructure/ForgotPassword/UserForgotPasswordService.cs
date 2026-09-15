@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace UserService.Infrastructure.EmailConfirmation;
+namespace UserService.Infrastructure.ForgotPassword;
 
-public class EmailConfirmationService : IEmailConfirmationService
+public class UserForgotPasswordService : IUserForgotPasswordService
 {
     public string GenerateToken()
     {

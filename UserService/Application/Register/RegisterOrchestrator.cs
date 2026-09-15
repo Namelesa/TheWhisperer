@@ -1,12 +1,12 @@
 using AutoMapper;
 using Encryptor.Encryption;
 using FluentValidation;
-using UserService.Application.EmailConfirmation;
 using UserService.Application.HasherPassword;
 using UserService.Application.HasherUser;
 using UserService.Application.Register.Dto;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.User;
+using UserService.Infrastructure.EmailConfirmation;
 
 namespace UserService.Application.Register;
 
@@ -34,7 +34,7 @@ public class RegisterOrchestrator(
             await userRepository.GetUserByEmailHashAsync(hashedEmail) is not null)
             return OperationResult<string>.Fail("User with this nick name or email already exists");
         
-        var hashedSecretWord = hasherUser.Hash(registerDto.SecretWord);
+        var hashedSecretWord = hasherPassword.Hash(registerDto.SecretWord);
         var hashedPassword = hasherPassword.Hash(registerDto.Password);
         
         var user = mapper.Map<Core.User.User>(registerDto);

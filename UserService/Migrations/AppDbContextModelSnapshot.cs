@@ -54,6 +54,38 @@ namespace UserService.Migrations
                     b.ToTable("UserEmailConfirmations");
                 });
 
+            modelBuilder.Entity("UserService.Core.ForgotPassword.UserForgotPassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserForgotPasswords");
+                });
+
             modelBuilder.Entity("UserService.Core.User.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -92,11 +124,6 @@ namespace UserService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("SecretWort")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
                     b.Property<string>("SecretWortHash")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -114,6 +141,17 @@ namespace UserService.Migrations
                 });
 
             modelBuilder.Entity("UserService.Core.EmailConfirmation.UserEmailConfirmation", b =>
+                {
+                    b.HasOne("UserService.Core.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserService.Core.ForgotPassword.UserForgotPassword", b =>
                 {
                     b.HasOne("UserService.Core.User.User", "User")
                         .WithMany()

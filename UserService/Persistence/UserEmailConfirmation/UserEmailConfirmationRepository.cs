@@ -27,16 +27,10 @@ public class UserEmailConfirmationRepository(AppDbContext db) : IUserEmailConfir
         await db.SaveChangesAsync();
     }
     
-    public async Task DeleteByUserIdAsync(Guid userId)
+    public async Task DeleteAllByUserIdAsync(Guid userId)
     {
-        var confirmations = await db.UserEmailConfirmations
+        await db.UserEmailConfirmations
             .Where(x => x.UserId == userId)
-            .ToListAsync();
-
-        if (confirmations.Count == 0)
-            return;
-
-        db.UserEmailConfirmations.RemoveRange(confirmations);
-        await db.SaveChangesAsync();
+            .ExecuteDeleteAsync();
     }
 }

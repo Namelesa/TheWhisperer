@@ -1,22 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace UserService.Core.EmailConfirmation;
+namespace UserService.Core.ForgotPassword;
 
-public class UserEmailConfirmation(Guid userId)
+public class UserForgotPassword(Guid userId)
 {
     [Key]
     public Guid Id { get; init; }
 
     public Guid UserId { get; init; } = userId;
-    
-    public User.User User { get; init; }
 
+    public User.User User { get; init; }
+    
     public string TokenHash { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTime CreatedAt { private set; get; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime? UsedAt { get; private set; }
-
+    
     public void MarkAsUsed()
     {
         UsedAt = DateTime.UtcNow;
@@ -26,6 +26,6 @@ public class UserEmailConfirmation(Guid userId)
     {
         TokenHash = tokenHash;
         CreatedAt = DateTime.UtcNow;
-        ExpiresAt = CreatedAt.AddHours(24);
+        ExpiresAt = CreatedAt.AddMinutes(15);
     }
 }

@@ -25,6 +25,9 @@ public class LoginOrchestrator(
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");
         
+        if(!user.ConfirmedEmail)
+            return OperationResult<string>.Fail("Email is not confirmed");
+        
         return !hasherPassword.Verify(loginDto.Password, user.PasswordHash) 
             ? OperationResult<string>.Fail("Incorrect password") 
             : OperationResult<string>.Ok("User logged in successfully");

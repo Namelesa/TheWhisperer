@@ -2,12 +2,12 @@ using AutoMapper;
 using FluentValidation;
 using Encryptor.Decryption;
 using Encryptor.Encryption;
-using UserService.Application.EmailConfirmation;
 using UserService.Application.HasherPassword;
 using UserService.Application.HasherUser;
 using UserService.Application.User.Dto;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.User;
+using UserService.Infrastructure.EmailConfirmation;
 
 namespace UserService.Application.User;
 
@@ -78,7 +78,7 @@ public class UserOrchestrator(
             user.UpdateEmail(encryptedEmail, newEmailHash);
 
             await userEmailConfirmationRepository
-                .DeleteByUserIdAsync(user.Id);
+                .DeleteAllByUserIdAsync(user.Id);
             
             var token = emailConfirmationService.GenerateToken();
             var tokenHash = emailConfirmationService.HashToken(token);
@@ -113,14 +113,16 @@ public class UserOrchestrator(
         return OperationResult<string>.Ok("User deleted successfully");
     }
 
-    public async Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto, Guid userId)
+    public async Task<OperationResult<string>> UpdateUserPasswordAsync(
+        EditUserPasswordDto editUserPasswordDto, 
+        Guid userId)
     {
         var user = await userRepository.GetUserByIdAsync(userId);
 
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");
         
-        if (!hasherUser.Verify(editUserPasswordDto.SecretWord, user.SecretWortHash))
+        if (!hasherPassword.Verify(editUserPasswordDto.SecretWord, user.SecretWortHash))
             return OperationResult<string>.Fail("Incorrect secret word");
         
         var newPasswordHash = hasherPassword.Hash(editUserPasswordDto.NewPassword);

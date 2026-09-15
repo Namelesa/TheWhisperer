@@ -1,3 +1,4 @@
+using UserService.WebApi.ForgotPassword;
 using UserService.WebApi.Login;
 using UserService.WebApi.Register;
 using UserService.WebApi.User;
@@ -13,6 +14,7 @@ public static class AddWebApi
         services.AddAutoMapper(config => config.AddProfile(new RegisterMapper()));
         services.AddAutoMapper(config => config.AddProfile(new LoginMapper()));
         services.AddAutoMapper(config => config.AddProfile(new UserMapper()));
+        services.AddAutoMapper(config => config.AddProfile(new ForgotPasswordMapper()));
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

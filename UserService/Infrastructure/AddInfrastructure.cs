@@ -1,9 +1,9 @@
 using Encryptor.Decryption;
 using Encryptor.Encryption;
-using UserService.Application.EmailConfirmation;
 using UserService.Application.HasherPassword;
 using UserService.Application.HasherUser;
 using UserService.Infrastructure.EmailConfirmation;
+using UserService.Infrastructure.ForgotPassword;
 using UserService.Infrastructure.UnconfirmedUserCleanup;
 
 namespace UserService.Infrastructure;
@@ -23,7 +23,9 @@ public static class AddInfrastructure
         
         services.AddSingleton<IHasherPassword, HasherPassword.HasherPassword>();
         services.AddSingleton<IEmailConfirmationService, EmailConfirmationService>();
+        services.AddSingleton<IUserForgotPasswordService, UserForgotPasswordService>();
         services.AddHostedService<UnconfirmedUsersCleanupService>();
+        // services.AddHostedService<UnconfirmedUsersCleanupService>();
         services.AddSingleton<IEncryptInfo, EncryptInfo>();
         services.AddSingleton<IDecryptInfo, DecryptInfo>();
     }
