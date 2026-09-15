@@ -8,6 +8,5 @@ public interface IUserOrchestrator
         EditUserDto editUserDto, 
         Guid userId);
     public Task<OperationResult<string>> DeleteUserAsync(Guid userId);
-    public Task<OperationResult<string>> UpdateUserPasswordAsync(EditUserPasswordDto editUserPasswordDto, Guid userId);
     public Task<OperationResult<UserDto>> GetUserByIdAsync(Guid userId);
 }

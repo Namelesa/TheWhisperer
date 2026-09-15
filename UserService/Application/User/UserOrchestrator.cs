@@ -2,7 +2,6 @@ using AutoMapper;
 using FluentValidation;
 using Encryptor.Decryption;
 using Encryptor.Encryption;
-using UserService.Application.HasherPassword;
 using UserService.Application.HasherUser;
 using UserService.Application.User.Dto;
 using UserService.Core.EmailConfirmation;
@@ -15,7 +14,6 @@ public class UserOrchestrator(
     IUserRepository userRepository,
     IValidator<EditUserDto> validator,
     IHasherUser hasherUser,
-    IHasherPassword hasherPassword,
     IMapper mapper,
     IUserEmailConfirmationRepository userEmailConfirmationRepository,
     IEmailConfirmationService emailConfirmationService,
@@ -111,24 +109,5 @@ public class UserOrchestrator(
         await userRepository.DeleteUserAsync(user);
 
         return OperationResult<string>.Ok("User deleted successfully");
-    }
-
-    public async Task<OperationResult<string>> UpdateUserPasswordAsync(
-        EditUserPasswordDto editUserPasswordDto, 
-        Guid userId)
-    {
-        var user = await userRepository.GetUserByIdAsync(userId);
-
-        if (user is null)
-            return OperationResult<string>.Fail("User with this nick name does not exist");
-        
-        if (!hasherPassword.Verify(editUserPasswordDto.SecretWord, user.SecretWortHash))
-            return OperationResult<string>.Fail("Incorrect secret word");
-        
-        var newPasswordHash = hasherPassword.Hash(editUserPasswordDto.NewPassword);
-        user.UpdatePassword(newPasswordHash);
-        
-        await userRepository.UpdateUserAsync(user);
-        return OperationResult<string>.Ok("User data updated successfully");
     }
 }

@@ -27,18 +27,6 @@ public class UserController(
             : BadRequest(new { message = result.Message });
     } 
     
-    [HttpPatch("edit-user-password")]
-    public async Task<IActionResult> UpdateUserPasswordAsync(
-        [Required, FromForm] EditUserPasswordContract editUserPasswordContract, Guid userId)
-    {
-        var editDto = mapper.Map<EditUserPasswordDto>(editUserPasswordContract);
-        var result = await userOrchestrator.UpdateUserPasswordAsync(editDto, userId);
-
-        return result.Success
-            ? Ok(new { message = result.Data })
-            : BadRequest(new { message = result.Message });
-    } 
-    
     [HttpDelete("delete-user")]
     public async Task<IActionResult> DeleteUserAsync(Guid userId)
     {
