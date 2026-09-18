@@ -4,4 +4,5 @@ public class AuthCookieSettings
 {
     public string Name { get; init; }
     public SameSiteMode SameSite { get; init; } = SameSiteMode.Strict;
+    public string RefreshTokenName { get; init; }
 }

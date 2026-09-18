@@ -5,6 +5,7 @@ using UserService.Infrastructure.ForgotPassword;
 using UserService.Infrastructure.HasherPassword;
 using UserService.Infrastructure.HasherUser;
 using UserService.Infrastructure.Jwt;
+using UserService.Infrastructure.RefreshTokenCleanup;
 using UserService.Infrastructure.UnconfirmedUserCleanup;
 
 namespace UserService.Infrastructure;
@@ -26,9 +27,15 @@ public static class AddInfrastructure
         services.AddSingleton<IEmailConfirmationService, EmailConfirmationService>();
         services.AddSingleton<IUserForgotPasswordService, UserForgotPasswordService>();
         services.AddHostedService<UnconfirmedUsersCleanupService>();
-        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.AddHostedService<RefreshTokenCleanupService>();
+        
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection("Jwt"))
+            .Validate(s => !string.IsNullOrEmpty(s.Key), "Jwt:Key must be configured")
+            .Validate(s => !string.IsNullOrEmpty(s.Issuer), "Jwt:Issuer must be configured")
+            .ValidateOnStart();
+        
         services.AddScoped<IJwtService, JwtService>();
-        // services.AddHostedService<UnconfirmedUsersCleanupService>();
         services.AddSingleton<IEncryptInfo, EncryptInfo>();
         services.AddSingleton<IDecryptInfo, DecryptInfo>();
     }

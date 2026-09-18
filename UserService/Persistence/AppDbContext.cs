@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UserService.Core.RefreshToken;
 
 namespace UserService.Persistence;
 
@@ -9,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<Core.EmailConfirmation.UserEmailConfirmation> UserEmailConfirmations { get; init; }
     public DbSet<Core.ForgotPassword.UserForgotPassword> UserForgotPasswords { get; init; }
+    public DbSet<RefreshTokenModel> RefreshTokens { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +75,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             });
         
         modelBuilder.Entity<Core.ForgotPassword.UserForgotPassword>(
+            builder =>
+            {
+                builder.HasKey(x => x.Id);
+
+                builder.Property(x => x.TokenHash)
+                    .IsRequired();
+
+                builder.HasIndex(x => x.TokenHash)
+                    .IsUnique();
+
+                builder.Property(x => x.CreatedAt)
+                    .IsRequired();
+
+                builder.Property(x => x.ExpiresAt)
+                    .IsRequired();
+
+                builder.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        
+        modelBuilder.Entity<RefreshTokenModel>(
             builder =>
             {
                 builder.HasKey(x => x.Id);

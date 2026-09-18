@@ -27,7 +27,7 @@ public class ForgotPasswordController(
         if(!result.Success)
             return BadRequest(new { message = result.Message });
         
-        authCookieWriter.RemoveAccessTokenCookie(Response);
+        authCookieWriter.RemoveAuthCookies(Response);
         
         return Ok(new { message = result.Data });
     } 
@@ -42,7 +42,7 @@ public class ForgotPasswordController(
         if(!result.Success)
             return BadRequest(new { message = result.Message });
         
-        authCookieWriter.RemoveAccessTokenCookie(Response);
+        authCookieWriter.RemoveAuthCookies(Response);
         
         return Ok(new { message = result.Data });
     } 

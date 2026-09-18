@@ -11,19 +11,32 @@ public class AuthCookieWriter(
     private readonly AuthCookieSettings _cookieSettings = cookieOptions.Value;
     private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
-    public void SetAccessTokenCookie(HttpResponse response, string token)
+    public void SetAuthCookies(HttpResponse response, string accessToken, string refreshToken)
     {
-        response.Cookies.Append(_cookieSettings.Name, token, new CookieOptions
+        response.Cookies.Append(_cookieSettings.Name, accessToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = _cookieSettings.SameSite,
             Expires = DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.AccessTokenMinutes)
         });
-    }
 
-    public void RemoveAccessTokenCookie(HttpResponse response)
+        response.Cookies.Append(_cookieSettings.RefreshTokenName, refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = _cookieSettings.SameSite,
+            Path = "/api/refresh",
+            Expires = DateTimeOffset.UtcNow.AddDays(_jwtSettings.RefreshTokenDays)
+        });
+    }
+    
+    public void RemoveAuthCookies(HttpResponse response)
     {
         response.Cookies.Delete(_cookieSettings.Name);
+        response.Cookies.Delete(_cookieSettings.RefreshTokenName, new CookieOptions
+        {
+            Path = "/api/refresh"
+        });
     }
 }

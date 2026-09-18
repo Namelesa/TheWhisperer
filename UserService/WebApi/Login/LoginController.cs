@@ -24,8 +24,8 @@ public class LoginController(
         if (!result.Success)
             return BadRequest(new { message = result.Message });
 
-        authCookieWriter.SetAccessTokenCookie(Response, result.Data!);
+        authCookieWriter.SetAuthCookies(Response, result.Data!.AccessToken, result.Data.RefreshToken);
 
         return Ok(new { message = "Logged in successfully" });
-    } 
+    }
 }

@@ -86,6 +86,38 @@ namespace UserService.Migrations
                     b.ToTable("UserForgotPasswords");
                 });
 
+            modelBuilder.Entity("UserService.Core.RefreshToken.RefreshTokenModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("UserService.Core.User.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -152,6 +184,17 @@ namespace UserService.Migrations
                 });
 
             modelBuilder.Entity("UserService.Core.ForgotPassword.UserForgotPassword", b =>
+                {
+                    b.HasOne("UserService.Core.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserService.Core.RefreshToken.RefreshTokenModel", b =>
                 {
                     b.HasOne("UserService.Core.User.User", "User")
                         .WithMany()

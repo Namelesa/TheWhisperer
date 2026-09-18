@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Core.User;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.ForgotPassword;
+using UserService.Core.RefreshToken;
 using UserService.Persistence.User;
 using UserService.Persistence.UserEmailConfirmation;
 using UserService.Persistence.UserForgotPassword;
 using UserService.Persistence.DbInitializer;
+using UserService.Persistence.RefreshToken;
 
 namespace UserService.Persistence;
 
@@ -20,6 +22,7 @@ public static class AddPersistence
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserEmailConfirmationRepository, UserEmailConfirmationRepository>();
         services.AddScoped<IUserForgotPasswordRepository, UserForgotPasswordRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IDbInitializer, DbInitializer.DbInitializer>();
     }
 }
