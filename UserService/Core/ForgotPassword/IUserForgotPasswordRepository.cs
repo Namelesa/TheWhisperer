@@ -3,8 +3,6 @@ namespace UserService.Core.ForgotPassword;
 public interface IUserForgotPasswordRepository
 {
     public Task AddAsync(UserForgotPassword userForgotPassword);
-
-    public Task DeleteAsync(UserForgotPassword userForgotPassword);
     
     public Task UpdateAsync(UserForgotPassword userForgotPassword);
 

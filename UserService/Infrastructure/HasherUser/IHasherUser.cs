@@ -1,4 +1,4 @@
-namespace UserService.Application.HasherUser;
+namespace UserService.Infrastructure.HasherUser;
 
 public interface IHasherUser
 {

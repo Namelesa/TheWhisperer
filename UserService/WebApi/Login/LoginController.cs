@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Login;
 using UserService.Application.Login.Dto;
+using UserService.WebApi.Auth;
 using UserService.WebApi.Login.Contracts;
 
 namespace UserService.WebApi.Login;
@@ -11,7 +12,8 @@ namespace UserService.WebApi.Login;
 [Route("api")]
 public class LoginController(
     IMapper mapper, 
-    ILoginOrchestrator loginOrchestrator) : ControllerBase
+    ILoginOrchestrator loginOrchestrator,
+    IAuthCookieWriter authCookieWriter) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([Required, FromForm] LoginContract loginContract)
@@ -19,8 +21,11 @@ public class LoginController(
         var loginDto = mapper.Map<LoginDto>(loginContract);
         var result = await loginOrchestrator.LoginAsync(loginDto);
 
-        return result.Success
-            ? Ok(new { message = result.Data })
-            : BadRequest(new { message = result.Message });
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
+
+        authCookieWriter.SetAccessTokenCookie(Response, result.Data!);
+
+        return Ok(new { message = "Logged in successfully" });
     } 
 }

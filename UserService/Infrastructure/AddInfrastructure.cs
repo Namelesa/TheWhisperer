@@ -1,9 +1,10 @@
 using Encryptor.Decryption;
 using Encryptor.Encryption;
-using UserService.Application.HasherPassword;
-using UserService.Application.HasherUser;
 using UserService.Infrastructure.EmailConfirmation;
 using UserService.Infrastructure.ForgotPassword;
+using UserService.Infrastructure.HasherPassword;
+using UserService.Infrastructure.HasherUser;
+using UserService.Infrastructure.Jwt;
 using UserService.Infrastructure.UnconfirmedUserCleanup;
 
 namespace UserService.Infrastructure;
@@ -25,6 +26,8 @@ public static class AddInfrastructure
         services.AddSingleton<IEmailConfirmationService, EmailConfirmationService>();
         services.AddSingleton<IUserForgotPasswordService, UserForgotPasswordService>();
         services.AddHostedService<UnconfirmedUsersCleanupService>();
+        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.AddScoped<IJwtService, JwtService>();
         // services.AddHostedService<UnconfirmedUsersCleanupService>();
         services.AddSingleton<IEncryptInfo, EncryptInfo>();
         services.AddSingleton<IDecryptInfo, DecryptInfo>();

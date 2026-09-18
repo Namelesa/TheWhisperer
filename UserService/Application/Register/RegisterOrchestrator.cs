@@ -1,12 +1,12 @@
 using AutoMapper;
 using Encryptor.Encryption;
 using FluentValidation;
-using UserService.Application.HasherPassword;
-using UserService.Application.HasherUser;
 using UserService.Application.Register.Dto;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.User;
 using UserService.Infrastructure.EmailConfirmation;
+using UserService.Infrastructure.HasherPassword;
+using UserService.Infrastructure.HasherUser;
 
 namespace UserService.Application.Register;
 

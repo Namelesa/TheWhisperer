@@ -1,9 +1,9 @@
-using UserService.Application.HasherPassword;
-using UserService.Application.HasherUser;
 using UserService.Application.PasswordRecovery.Dto;
 using UserService.Core.ForgotPassword;
 using UserService.Core.User;
 using UserService.Infrastructure.ForgotPassword;
+using UserService.Infrastructure.HasherPassword;
+using UserService.Infrastructure.HasherUser;
 
 namespace UserService.Application.PasswordRecovery;
 

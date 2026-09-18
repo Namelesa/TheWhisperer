@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using Konscious.Security.Cryptography;
-using UserService.Application.HasherPassword;
 
 namespace UserService.Infrastructure.HasherPassword;
 

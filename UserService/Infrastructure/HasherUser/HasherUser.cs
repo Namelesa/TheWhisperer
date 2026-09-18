@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using UserService.Application.HasherUser;
 
 namespace UserService.Infrastructure.HasherUser;
 

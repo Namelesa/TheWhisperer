@@ -10,13 +10,7 @@ public class UserForgotPasswordRepository(AppDbContext db) : IUserForgotPassword
         await db.UserForgotPasswords.AddAsync(userForgotPassword);
         await db.SaveChangesAsync();
     }
-
-    public async Task DeleteAsync(Core.ForgotPassword.UserForgotPassword userForgotPassword)
-    {
-        db.UserForgotPasswords.Remove(userForgotPassword);
-        await db.SaveChangesAsync();
-    }
-
+    
     public async Task UpdateAsync(Core.ForgotPassword.UserForgotPassword userForgotPassword)
     {
         db.UserForgotPasswords.Update(userForgotPassword);

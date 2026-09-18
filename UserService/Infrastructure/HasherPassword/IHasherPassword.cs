@@ -1,4 +1,4 @@
-namespace UserService.Application.HasherPassword;
+namespace UserService.Infrastructure.HasherPassword;
 
 public interface IHasherPassword
 {

@@ -1,17 +1,21 @@
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.PasswordRecovery;
 using UserService.Application.PasswordRecovery.Dto;
+using UserService.WebApi.Auth;
 using UserService.WebApi.ForgotPassword.Contracts;
 
 namespace UserService.WebApi.ForgotPassword;
 
+[Authorize]
 [ApiController]
 [Route("api")]
 public class ForgotPasswordController(
     IMapper mapper,
-    IPasswordRecoveryOrchestrator passwordRecoveryOrchestrator) : ControllerBase
+    IPasswordRecoveryOrchestrator passwordRecoveryOrchestrator,
+    IAuthCookieWriter authCookieWriter) : ControllerBase
 {
     [HttpPatch("forgot-password")]
     public async Task<IActionResult> ForgotPasswordAsync(
@@ -20,9 +24,12 @@ public class ForgotPasswordController(
         var forgotPasswordDto = mapper.Map<ForgotPasswordDto>(forgotPasswordContract);
         var result = await passwordRecoveryOrchestrator.ForgotPasswordAsync(forgotPasswordDto);
 
-        return result.Success
-            ? Ok(new { message = result.Data })
-            : BadRequest(new { message = result.Message });
+        if(!result.Success)
+            return BadRequest(new { message = result.Message });
+        
+        authCookieWriter.RemoveAccessTokenCookie(Response);
+        
+        return Ok(new { message = result.Data });
     } 
     
     [HttpPatch("reset-password")]
@@ -32,8 +39,11 @@ public class ForgotPasswordController(
         var resetPasswordDto = mapper.Map<ResetPasswordDto>(resetPasswordContract);
         var result = await passwordRecoveryOrchestrator.ResetPasswordAsync(resetPasswordDto);
 
-        return result.Success
-            ? Ok(new { message = result.Data })
-            : BadRequest(new { message = result.Message });
+        if(!result.Success)
+            return BadRequest(new { message = result.Message });
+        
+        authCookieWriter.RemoveAccessTokenCookie(Response);
+        
+        return Ok(new { message = result.Data });
     } 
 }

@@ -1,8 +1,9 @@
 using FluentValidation;
-using UserService.Application.HasherPassword;
-using UserService.Application.HasherUser;
 using UserService.Application.Login.Dto;
 using UserService.Core.User;
+using UserService.Infrastructure.HasherPassword;
+using UserService.Infrastructure.HasherUser;
+using UserService.Infrastructure.Jwt;
 
 namespace UserService.Application.Login;
 
@@ -10,6 +11,7 @@ public class LoginOrchestrator(
     IUserRepository userRepository, 
     IHasherUser hasherUser, 
     IHasherPassword hasherPassword,
+    IJwtService jwtService,
     IValidator<LoginDto> validator) : ILoginOrchestrator
 {
     public async Task<OperationResult<string>> LoginAsync(LoginDto loginDto)
@@ -28,8 +30,10 @@ public class LoginOrchestrator(
         if(!user.ConfirmedEmail)
             return OperationResult<string>.Fail("Email is not confirmed");
         
+        var accessToken = jwtService.GenerateAccessToken(user.Id, user.NickName);
+        
         return !hasherPassword.Verify(loginDto.Password, user.PasswordHash) 
             ? OperationResult<string>.Fail("Incorrect password") 
-            : OperationResult<string>.Ok("User logged in successfully");
+            : OperationResult<string>.Ok($"{accessToken}");
     }
 }
