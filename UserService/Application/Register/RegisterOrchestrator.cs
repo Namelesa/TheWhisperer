@@ -1,6 +1,8 @@
 using AutoMapper;
 using Encryptor.Encryption;
 using FluentValidation;
+using MassTransit;
+using SharedModels.User.UserConfirmEmail;
 using UserService.Application.Register.Dto;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.User;
@@ -18,7 +20,8 @@ public class RegisterOrchestrator(
     IValidator<RegisterDto> validator,
     IEmailConfirmationService emailConfirmationService,
     IUserEmailConfirmationRepository userEmailConfirmationRepository,
-    IEncryptInfo encryptInfo) : IRegisterOrchestrator
+    IEncryptInfo encryptInfo,
+    IPublishEndpoint publishEndpoint) : IRegisterOrchestrator
 {
     public async Task<OperationResult<string>> RegisterUserAsync(RegisterDto registerDto)
     {
@@ -53,7 +56,12 @@ public class RegisterOrchestrator(
         confirmation.SetToken(tokenHash);
         Console.WriteLine($"Confirmation token for user {registerDto.NickName}: {token}");
 
-        // Send email with the token to the user's email address
+        var confirmationEmail = new UserEmailConfirmModel(
+            user.NickName, 
+            user.Email, 
+            encryptInfo.Encrypt(token));
+        
+        await publishEndpoint.Publish(confirmationEmail);
         
         await userEmailConfirmationRepository.AddAsync(confirmation);
         

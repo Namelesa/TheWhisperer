@@ -25,7 +25,7 @@ public class RegisterController(
             : BadRequest(new { message = result.Message });
     } 
     
-    [HttpPost("confirm-email")]
+    [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmailAsync(
         [FromQuery] string token,
         [FromQuery] string nickname)

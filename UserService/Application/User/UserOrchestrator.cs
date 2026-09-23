@@ -2,6 +2,8 @@ using AutoMapper;
 using FluentValidation;
 using Encryptor.Decryption;
 using Encryptor.Encryption;
+using MassTransit;
+using SharedModels.User.UserDelete;
 using UserService.Application.User.Dto;
 using UserService.Core.EmailConfirmation;
 using UserService.Core.User;
@@ -18,7 +20,8 @@ public class UserOrchestrator(
     IUserEmailConfirmationRepository userEmailConfirmationRepository,
     IEmailConfirmationService emailConfirmationService,
     IDecryptInfo decryptInfo,
-    IEncryptInfo encryptInfo) : IUserOrchestrator
+    IEncryptInfo encryptInfo,
+    IPublishEndpoint publishEndpoint) : IUserOrchestrator
 {
     public async Task<OperationResult<UserDto>> GetUserByIdAsync(Guid userId)
     {
@@ -106,6 +109,9 @@ public class UserOrchestrator(
         if (user is null)
             return OperationResult<string>.Fail("User with this nick name does not exist");
 
+        var deleteUserByEmail = new UserDeleteByEmailModel(user.NickName, user.Email);
+        await publishEndpoint.Publish(deleteUserByEmail);
+        
         await userRepository.DeleteUserAsync(user);
 
         return OperationResult<string>.Ok("User deleted successfully");
