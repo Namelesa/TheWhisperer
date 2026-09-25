@@ -3,6 +3,7 @@ using FluentValidation;
 using Encryptor.Decryption;
 using Encryptor.Encryption;
 using MassTransit;
+using SharedModels.User.UserConfirmEmail;
 using SharedModels.User.UserDelete;
 using UserService.Application.User.Dto;
 using UserService.Core.EmailConfirmation;
@@ -69,6 +70,7 @@ public class UserOrchestrator(
 
         if (editUserDto.Email is not null)
         {
+            Console.WriteLine(editUserDto.Email);
             var newEmailHash = hasherUser.Hash(editUserDto.Email);
             var existingUser = await userRepository.GetUserByEmailHashAsync(newEmailHash);
 
@@ -87,7 +89,8 @@ public class UserOrchestrator(
             var confirmation = new UserEmailConfirmation(user.Id);
             confirmation.SetToken(tokenHash);
 
-            // Send email confirmation to the new email address
+            var userUpdateEmail = new UserEmailConfirmModel(user.NickName, user.Email, encryptInfo.Encrypt(token));
+            await publishEndpoint.Publish(userUpdateEmail);
             
             await userEmailConfirmationRepository.AddAsync(confirmation);
         }
@@ -98,6 +101,9 @@ public class UserOrchestrator(
             user.SetImage(encryptedImage);
         }
 
+        var userUpdateData = new UserEmailConfirmModel(user.NickName, user.Email, null);
+        await publishEndpoint.Publish(userUpdateData);
+        
         await userRepository.UpdateUserAsync(user);
         return OperationResult<string>.Ok("User data updated successfully");
     }

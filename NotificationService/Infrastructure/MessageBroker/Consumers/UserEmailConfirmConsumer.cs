@@ -17,15 +17,33 @@ public class UserEmailConfirmConsumer(
     {
         var info = context.Message;
         var userDto = mapper.Map<UserInfoModel>(info);
-    
-        decryptInfo.DecryptObjectStrings(userDto);
-    
-        var result = await userInfoOrchestrator.SendConfirmEmailAsync(userDto);
-    
-        if (!result.Success)
+
+        if (userDto.Token == null)
         {
-            logger.LogWarning("Failed to send confirmation email: {Message}", result.Message);
-            throw new InvalidOperationException(result.Message);
+            var email = decryptInfo.Decrypt(userDto.Email);
+            var nickName = decryptInfo.Decrypt(userDto.NickName);
+            
+            userDto.SetNickNameAndEmail(nickName, email);
+            
+            var result = await userInfoOrchestrator.SendEditUserInfoEmailAsync(userDto);
+    
+            if (!result.Success)
+            {
+                logger.LogWarning("Failed to send confirmation email: {Message}", result.Message);
+                throw new InvalidOperationException(result.Message);
+            }
+        }
+        else
+        {
+            decryptInfo.DecryptObjectStrings(userDto);
+        
+            var result = await userInfoOrchestrator.SendConfirmEmailAsync(userDto);
+            
+            if (!result.Success)
+            {
+                logger.LogWarning("Failed to send confirmation email: {Message}", result.Message);
+                throw new InvalidOperationException(result.Message);
+            }
         }
     }
 }
